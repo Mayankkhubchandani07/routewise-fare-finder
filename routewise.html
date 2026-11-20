@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#101827">
+<title>RouteWise — Find your smartest fare</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+:root{--ink:#101827;--muted:#697586;--line:#e7ebf0;--paper:#f5f7fa;--white:#fff;--lime:#c8f169;--green:#167a54;--purple:#7657e8;--shadow:0 18px 50px rgba(20,35,55,.09)}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:'DM Sans',sans-serif}button,input{font:inherit}button{cursor:pointer}.wrap{max-width:1180px;margin:auto;padding:0 26px}
+nav{height:76px;display:flex;align-items:center;justify-content:space-between}.brand{display:flex;align-items:center;gap:10px;font:700 22px 'Space Grotesk';letter-spacing:-.8px}.logo{width:35px;height:35px;border-radius:11px;background:var(--lime);display:grid;place-items:center;font-size:19px}.navright{display:flex;align-items:center;gap:22px;color:#667085;font-size:13px}.navright a{color:inherit;text-decoration:none}.pill{background:#edf4df;color:#36531c;padding:8px 12px;border-radius:30px;font-weight:700}
+.hero{padding:58px 0 42px;display:grid;grid-template-columns:1.1fr .9fr;gap:35px;align-items:center}.eyebrow{font-size:11px;letter-spacing:1.8px;text-transform:uppercase;font-weight:700;color:#66843b;display:flex;align-items:center;gap:8px}.dot{width:7px;height:7px;background:#8bc34a;border-radius:50%}h1{font:700 clamp(38px,5vw,61px)/1.04 'Space Grotesk';letter-spacing:-2.8px;margin:18px 0 15px;max-width:650px}h1 span{color:#6d8e35}.hero p{color:var(--muted);line-height:1.7;max-width:510px;margin:0;font-size:15px}.hero-art{background:#eaf1dd;border-radius:28px;min-height:235px;position:relative;overflow:hidden;padding:25px}.art-label{font-size:12px;color:#52633c;font-weight:700}.route-graphic{position:absolute;inset:48px 15px 0 15px}.route-graphic svg{width:100%;height:100%}.bubble{position:absolute;background:white;box-shadow:var(--shadow);border-radius:14px;padding:11px 14px;font-size:12px;font-weight:700}.bubble.one{top:67px;left:25px}.bubble.two{right:20px;bottom:24px}.bubble small{display:block;color:#83906f;font-weight:500;margin-top:3px}
+.search-panel{background:var(--white);border:1px solid var(--line);border-radius:22px;padding:23px;box-shadow:var(--shadow);margin-bottom:25px}.panel-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}.panel-head h2{font:700 18px 'Space Grotesk';margin:0}.panel-head span{font-size:12px;color:var(--muted)}.route-fields{display:grid;grid-template-columns:1fr 1fr auto;gap:12px;align-items:end}.field label{display:block;font-size:11px;font-weight:700;color:#657184;margin:0 0 8px 3px}.inputbox{height:54px;border:1px solid var(--line);border-radius:12px;display:flex;align-items:center;padding:0 13px;gap:10px;background:#fbfcfd}.inputbox:focus-within{border-color:#9ab65c;box-shadow:0 0 0 3px #c8f16933}.inputbox .pin{font-size:17px}.inputbox input{border:0;outline:0;background:transparent;width:100%;font-size:14px;color:var(--ink)}.swap{position:absolute;right:-17px;top:37px;z-index:2;width:34px;height:34px;border:1px solid var(--line);background:white;border-radius:50%;font-size:16px}.field{position:relative}.search-btn{height:54px;padding:0 25px;background:var(--ink);color:white;border:0;border-radius:12px;font-weight:700;white-space:nowrap;transition:.2s}.search-btn:hover{background:#29364a;transform:translateY(-1px)}.search-btn:disabled{opacity:.55;cursor:wait}.under-fields{display:flex;gap:18px;align-items:center;margin-top:14px;color:#8993a1;font-size:11px}.text-btn{border:0;background:transparent;color:#607c2f;font-weight:700;padding:0}.date-select{margin-left:auto;border:1px solid var(--line);border-radius:9px;padding:7px 10px;background:white;color:#657184;font-size:11px}
+.results-head{display:flex;justify-content:space-between;align-items:end;margin:30px 0 15px}.results-head h2{font:700 23px 'Space Grotesk';margin:0 0 5px}.results-head p{font-size:12px;color:var(--muted);margin:0}.sort{border:1px solid var(--line);background:white;padding:9px 12px;border-radius:9px;color:#566273;font-size:12px}
+.content-grid{display:grid;grid-template-columns:1fr 320px;gap:18px;align-items:start}.results{display:flex;flex-direction:column;gap:12px}.fare-card{background:white;border:1px solid var(--line);border-radius:17px;padding:17px 19px;display:grid;grid-template-columns:1fr auto;gap:12px;transition:.2s}.fare-card:hover{border-color:#c5d79e;transform:translateY(-2px);box-shadow:0 9px 25px #1c2a3b0b}.fare-main{display:flex;align-items:center;gap:14px}.mode-icon{width:46px;height:46px;border-radius:14px;background:#f1f4f7;display:grid;place-items:center;font-size:23px}.mode-name{font-weight:700;font-size:14px}.mode-meta{font-size:11px;color:#8a94a2;margin-top:5px}.fare-price{text-align:right;font:700 23px 'Space Grotesk';letter-spacing:-.7px}.fare-price small{display:block;font:500 10px 'DM Sans';color:#929baa;letter-spacing:0;margin-top:3px}.card-bottom{grid-column:1/-1;border-top:1px solid #f0f2f5;padding-top:12px;display:flex;gap:18px;align-items:center;font-size:11px;color:#778292}.tag{font-size:9px;font-weight:700;padding:5px 8px;border-radius:30px;background:#eff6e5;color:#557a27}.tag.purple{background:#f1edff;color:#7054d6}.tag.blue{background:#eaf4ff;color:#3877b7}.choose{margin-left:auto;border:1px solid #e6eaf0;background:white;border-radius:8px;padding:7px 11px;font-size:11px;font-weight:700;color:#344054}.choose:hover{background:var(--ink);color:white}.side{display:flex;flex-direction:column;gap:14px}.map-card,.insight-card{background:white;border:1px solid var(--line);border-radius:17px;overflow:hidden}.side-title{padding:15px 16px 11px;font:700 14px 'Space Grotesk'}.map-caption{font-size:10px;color:#8b95a3;padding:0 16px 12px}.map-placeholder{height:195px;background:#edf2e6;display:grid;place-items:center;color:#66734f;font-size:12px;text-align:center;padding:20px}#map{height:195px;width:100%;display:none}.insight-card{padding:17px}.insight-top{display:flex;justify-content:space-between;align-items:center}.insight-top b{font:700 14px 'Space Grotesk'}.spark{font-size:20px}.insight-card p{font-size:11px;line-height:1.6;color:#778292;margin:10px 0 13px}.saving{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--line);padding-top:12px;font-size:11px;color:#778292}.saving strong{font:700 16px 'Space Grotesk';color:#27764e}.empty{background:white;border:1px dashed #d5dce5;border-radius:16px;padding:35px;text-align:center;color:#778292;font-size:13px;line-height:1.7}.empty b{display:block;color:var(--ink);font:700 16px 'Space Grotesk';margin-bottom:6px}
+.features{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:38px 0}.feature{padding:18px;background:white;border:1px solid var(--line);border-radius:15px}.feature-icon{font-size:20px}.feature b{display:block;font:700 13px 'Space Grotesk';margin:10px 0 5px}.feature p{font-size:11px;line-height:1.6;color:#7d8795;margin:0}
+footer{border-top:1px solid var(--line);padding:24px 0 35px;color:#929baa;font-size:11px;display:flex;justify-content:space-between;gap:15px}.toast{position:fixed;bottom:22px;left:50%;transform:translate(-50%,20px);opacity:0;background:#101827;color:white;padding:12px 17px;border-radius:11px;font-size:12px;transition:.25s;pointer-events:none;z-index:9999}.toast.show{opacity:1;transform:translate(-50%,0)}.loading{display:inline-block;width:13px;height:13px;border:2px solid #ffffff66;border-top-color:white;border-radius:50%;animation:spin .7s linear infinite;vertical-align:-2px;margin-right:7px}@keyframes spin{to{transform:rotate(360deg)}}
+@media(max-width:850px){.hero{grid-template-columns:1fr;padding-top:38px}.hero-art{min-height:200px}.content-grid{grid-template-columns:1fr}.side{display:grid;grid-template-columns:1fr 1fr}.route-fields{grid-template-columns:1fr 1fr}.search-btn{grid-column:1/-1}.swap{right:-17px}.features{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.wrap{padding:0 16px}nav{height:65px}.navright a{display:none}.hero{padding:32px 0}.hero-art{min-height:180px}.search-panel{padding:17px}.route-fields{grid-template-columns:1fr;gap:11px}.swap{right:10px;top:35px}.search-btn{grid-column:auto;width:100%}.under-fields{flex-wrap:wrap;gap:10px}.date-select{margin-left:0}.results-head{align-items:start;gap:10px}.results-head h2{font-size:20px}.fare-card{padding:14px}.fare-price{font-size:20px}.card-bottom{gap:9px;flex-wrap:wrap}.choose{margin-left:0}.side{grid-template-columns:1fr}.features{grid-template-columns:1fr}footer{flex-direction:column}}
+
+/* Bengaluru Metro Explorer */
+.metro-section{margin:42px 0;background:#fff;border:1px solid var(--line);border-radius:22px;padding:22px;box-shadow:0 10px 35px rgba(20,35,55,.045)}
+.metro-heading{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;margin-bottom:18px}
+.metro-heading h2{font:700 24px 'Space Grotesk';margin:0 0 6px;letter-spacing:-.7px}
+.metro-heading p{margin:0;color:var(--muted);font-size:12px;line-height:1.6;max-width:650px}
+.metro-ref{font-size:10px;background:#fff5df;color:#8a641e;padding:7px 10px;border-radius:30px;white-space:nowrap;font-weight:700}
+.metro-layout{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(260px,.8fr);gap:18px;align-items:start}
+.metro-map-frame{border:1px solid var(--line);border-radius:15px;overflow:hidden;background:#fafafa;position:relative}
+.metro-map-frame img{width:100%;height:auto;display:block;cursor:zoom-in}
+.metro-map-note{padding:10px 13px;background:#fafbfc;border-top:1px solid var(--line);font-size:10px;color:#778292}
+.metro-tools{display:flex;flex-direction:column;gap:12px}
+.metro-tool-card{border:1px solid var(--line);border-radius:15px;padding:16px}
+.metro-tool-card h3{font:700 15px 'Space Grotesk';margin:0 0 6px}
+.metro-tool-card p{font-size:11px;color:#7d8795;line-height:1.6;margin:0 0 13px}
+.metro-select{width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;background:#fff;margin:5px 0 10px;color:var(--ink);font-size:12px}
+.metro-calc{width:100%;border:0;border-radius:10px;background:var(--ink);color:#fff;padding:12px;font-weight:700;font-size:12px}
+.metro-result{margin-top:12px;background:#f2f7e9;border-radius:11px;padding:12px;font-size:11px;line-height:1.6;color:#465b2e;display:none}
+.line-legend{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
+.line-chip{font-size:10px;border:1px solid var(--line);border-radius:30px;padding:6px 9px;display:flex;align-items:center;gap:6px;color:#586273}
+.line-dot{width:9px;height:9px;border-radius:50%}
+.metro-quick{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.metro-quick button{border:1px solid var(--line);background:#fff;border-radius:9px;padding:9px 7px;font-size:10px;color:#586273}
+.metro-quick button:hover{border-color:#9bb96c;background:#f8fbf2}
+.map-modal{display:none;position:fixed;inset:0;background:#101827eF;z-index:99999;padding:3vh 3vw;align-items:center;justify-content:center}
+.map-modal.open{display:flex}
+.map-modal img{max-width:94vw;max-height:92vh;object-fit:contain;background:white;border-radius:10px}
+.map-modal button{position:absolute;top:18px;right:22px;background:white;border:0;border-radius:50%;width:40px;height:40px;font-size:22px}
+@media(max-width:800px){.metro-layout{grid-template-columns:1fr}.metro-heading{flex-direction:column}.metro-ref{white-space:normal}.metro-section{padding:16px}}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav><div class="brand"><div class="logo">↗</div>routewise<span style="color:#92a0af;font:500 11px 'DM Sans';letter-spacing:0">BETA</span></div><div class="navright"><a href="#how">How it works</a><a href="#metro-explorer">Metro map</a><a href="#features">Features</a><span class="pill">✦ Smarter trips, less spend</span></div></nav>
+<section class="hero">
+<div><div class="eyebrow"><span class="dot"></span> YOUR JOURNEY, OPTIMISED</div><h1>Go anywhere.<br><span>Spend smarter.</span></h1><p>Compare estimated fares across transport options in one place. Find the cheapest way to get there — without opening five different apps.</p></div>
+<div class="hero-art"><div class="art-label">ONE ROUTE. MANY WAYS TO GO.</div><div class="route-graphic"><svg viewBox="0 0 430 180" fill="none" preserveAspectRatio="xMidYMid meet"><path d="M20 125 C85 125 85 45 155 65 S245 160 310 95 S370 50 410 55" stroke="#9cb87a" stroke-width="4" stroke-dasharray="7 8" stroke-linecap="round"/><path d="M20 125 C85 125 85 45 155 65 S245 160 310 95 S370 50 410 55" stroke="#fff" stroke-width="1.5" stroke-dasharray="2 10"/><circle cx="20" cy="125" r="9" fill="#fff" stroke="#719044" stroke-width="4"/><circle cx="410" cy="55" r="9" fill="#c8f169" stroke="#719044" stroke-width="4"/><g fill="#71834f" opacity=".35"><circle cx="90" cy="25" r="13"/><circle cx="260" cy="25" r="8"/><circle cx="345" cy="145" r="15"/></g><g fill="#9db18b"><rect x="110" y="113" width="19" height="12" rx="3"/><rect x="115" y="104" width="9" height="9" rx="2"/><rect x="280" y="48" width="22" height="13" rx="3"/></g></svg></div><div class="bubble one">📍 Your starting point<small>Where are you now?</small></div><div class="bubble two">🏁 Destination<small>Let's find the best fare</small></div></div>
+</section>
+<section class="search-panel" id="how">
+<div class="panel-head"><h2>Where are you headed?</h2><span>✦ Compare multiple travel modes</span></div>
+<div class="route-fields">
+<div class="field"><label>FROM</label><div class="inputbox"><span class="pin">📍</span><input id="from" list="places" placeholder="e.g. Indiranagar, Bengaluru" autocomplete="off"></div><button class="swap" id="swap" title="Swap locations">⇅</button></div>
+<div class="field"><label>TO</label><div class="inputbox"><span class="pin">🏁</span><input id="to" list="places" placeholder="e.g. MG Road, Bengaluru" autocomplete="off"></div></div>
+<datalist id="places"><option value="Indiranagar, Bengaluru"><option value="MG Road, Bengaluru"><option value="Bengaluru City Railway Station"><option value="Kempegowda International Airport, Bengaluru"><option value="Whitefield, Bengaluru"><option value="Electronic City, Bengaluru"></datalist>
+<button class="search-btn" id="search">Find my best fare&nbsp; →</button>
+</div>
+<div class="under-fields"><button class="text-btn" id="locate">◎ Use my current location</button><span>•</span><span>Estimates in INR (₹)</span><select class="date-select" id="when"><option value="now">Leave now</option><option value="peak">Peak hours</option><option value="offpeak">Off-peak</option></select></div>
+</section>
+<div class="results-head"><div><h2>Your travel options</h2><p id="result-sub">Enter a route to compare fares and travel times.</p></div><select class="sort" id="sort"><option value="price">Sort: Lowest fare</option><option value="time">Sort: Fastest</option><option value="eco">Sort: Most eco-friendly</option></select></div>
+<div class="content-grid">
+<div class="results" id="results"><div class="empty"><b>Your best route is one search away.</b>Enter your starting point and destination above. We'll estimate fares for different ways to travel.</div></div>
+<aside class="side">
+<div class="map-card"><div class="side-title">Your route map</div><div class="map-caption" id="map-caption">Map appears after you search for a route.</div><div id="map"></div><div class="map-placeholder" id="map-placeholder">🗺️<br>Route preview will appear here</div></div>
+<div class="insight-card"><div class="insight-top"><b>RouteWise insight</b><span class="spark">✦</span></div><p id="insight">A little route planning can make a big difference. Compare options to see where your money goes further.</p><div class="saving"><span>Potential savings</span><strong id="saving">—</strong></div></div>
+</aside>
+</div>
+
+<section class="metro-section" id="metro-explorer">
+  <div class="metro-heading">
+    <div>
+      <div class="eyebrow"><span class="dot"></span> BENGALURU TRANSIT, MAPPED</div>
+      <h2>Explore the Bengaluru Metro</h2>
+      <p>Use the metro network map you shared to explore the line colours, major interchange stations and a simple station-to-station estimate.</p>
+    </div>
+    <span class="metro-ref">REFERENCE MAP · 2025</span>
+  </div>
+  <div class="metro-layout">
+    <div>
+      <div class="metro-map-frame">
+        <img id="metro-map-image" src="bengaluru-metro-map.png" alt="Bengaluru Metro network map showing Purple, Green, Yellow, Pink and Blue lines, with interchange stations" title="Click to enlarge the Bengaluru Metro map">
+        <div class="metro-map-note">Map image supplied by you. Network/operational status may have changed since this 2025 reference was made.</div>
+      </div>
+      <div class="line-legend">
+        <span class="line-chip"><i class="line-dot" style="background:#8c287f"></i>Purple line</span>
+        <span class="line-chip"><i class="line-dot" style="background:#079447"></i>Green line</span>
+        <span class="line-chip"><i class="line-dot" style="background:#f3d400"></i>Yellow line</span>
+        <span class="line-chip"><i class="line-dot" style="background:#ef83a8"></i>Pink line</span>
+        <span class="line-chip"><i class="line-dot" style="background:#78c7ec"></i>Blue line</span>
+        <span class="line-chip">◎ Interchange</span>
+      </div>
+    </div>
+    <div class="metro-tools">
+      <div class="metro-tool-card">
+        <h3>🚇 Metro trip estimator</h3>
+        <p>Choose two stations shown on the reference map to get an indicative stop count, journey time and fare range.</p>
+        <label for="metro-from" style="font-size:10px;font-weight:700;color:#657184">FROM STATION</label>
+        <select class="metro-select" id="metro-from">
+          <option>Majestic</option><option>Challaghatta</option><option>Whitefield (Kadugodi)</option><option>MG Road</option><option>Indiranagar</option><option>KR Pura</option><option>Silk Institute</option><option>Madavara</option><option>Ragigudda</option><option>Bommasandra</option><option>Central Silk Board</option><option>Electronic City</option><option>Nagawara</option><option>Hebbal</option><option>Kempegowda International Airport</option><option>Kalena Agrahara</option>
+        </select>
+        <label for="metro-to" style="font-size:10px;font-weight:700;color:#657184">TO STATION</label>
+        <select class="metro-select" id="metro-to">
+          <option>Whitefield (Kadugodi)</option><option>Majestic</option><option>Challaghatta</option><option>MG Road</option><option>Indiranagar</option><option>KR Pura</option><option>Silk Institute</option><option>Madavara</option><option>Ragigudda</option><option>Bommasandra</option><option>Central Silk Board</option><option>Electronic City</option><option>Nagawara</option><option>Hebbal</option><option>Kempegowda International Airport</option><option>Kalena Agrahara</option>
+        </select>
+        <button class="metro-calc" id="metro-calculate">Estimate metro trip →</button>
+        <div class="metro-result" id="metro-result"></div>
+        <div class="metro-quick">
+          <button type="button" data-from="Majestic" data-to="Whitefield (Kadugodi)">Majestic → Whitefield</button>
+          <button type="button" data-from="Majestic" data-to="Challaghatta">Majestic → Challaghatta</button>
+          <button type="button" data-from="Ragigudda" data-to="Bommasandra">Ragigudda → Bommasandra</button>
+          <button type="button" data-from="KR Pura" data-to="Central Silk Board">KR Pura → Silk Board</button>
+        </div>
+      </div>
+      <div class="metro-tool-card">
+        <h3>✨ RouteWise special</h3>
+        <p>Compare a metro-first journey with a direct cab or auto. The main fare comparison above includes a metro estimate alongside other travel modes.</p>
+        <button class="metro-calc" type="button" id="metro-fill-route" style="background:#edf4df;color:#456523">Use these stations in fare search ↗</button>
+      </div>
+    </div>
+  </div>
+</section>
+<div class="map-modal" id="metro-map-modal" role="dialog" aria-label="Expanded Bengaluru Metro map">
+  <button id="metro-map-close" aria-label="Close enlarged map">×</button>
+  <img src="bengaluru-metro-map.png" alt="Enlarged Bengaluru Metro map reference">
+</div>
+
+<section class="features" id="features">
+<div class="feature"><span class="feature-icon">⚡</span><b>One search, many choices</b><p>Compare bus, metro, bike taxi, auto, cab and self-drive estimates side by side.</p></div>
+<div class="feature"><span class="feature-icon">🌱</span><b>Travel a little greener</b><p>See an indicative eco score to understand which option may have a lower footprint.</p></div>
+<div class="feature"><span class="feature-icon">👥</span><b>Split the fare</b><p>Choose a travel option and calculate an estimated per-person cost for your group.</p></div>
+</section>
+<footer><span>© 2026 RouteWise. Plan better. Travel smarter.</span><span>Fare estimates are indicative, not live operator quotes.</span></footer>
+</div>
+<div class="toast" id="toast"></div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+// Metro Explorer: simple station-pair estimate based on the supplied 2025 map.
+// It is intentionally labelled indicative; this is not a live Namma Metro timetable/API.
+(function(){
+ const fromEl=document.getElementById('metro-from'),toEl=document.getElementById('metro-to'),out=document.getElementById('metro-result');
+ const modal=document.getElementById('metro-map-modal');
+ const groups={
+  'Purple':['Challaghatta','Kengeri','Pattanagere','Jnanabharathi','Nayandahalli','Mysuru Road','Deepanjali Nagar','Attiguppe','Vijayanagar','Majestic','Cubbon Park','MG Road','Trinity','Indiranagar','Hoodi','KR Pura','Whitefield (Kadugodi)'],
+  'Green':['Silk Institute','Konanakunte Cross','Yelachenahalli','Jaya Prakash Nagar','Banashankari','Rashtriya Vidyalaya Road','Lalbagh','South End Circle','National College','Majestic','Manjunathanagar','Nagasandra','Madavara'],
+  'Yellow':['Ragigudda','Jayadeva Hospital','BTM Layout','Central Silk Board','Bommanahalli','Hongasandra','Kudlu Gate','Singasandra','Hosa Road','Beratena Agrahara','Electronic City','Bommasandra'],
+  'Pink':['Kalena Agrahara','JP Nagar 4th Phase','Jayadeva Hospital','Tavarekere','Dairy Circle','Lakkasandra','Lalbagh','MG Road','Majestic','Pottery Town','Tannery Road','Venkateshpura','Nagawara'],
+  'Blue':['Kempegowda International Airport','Airport City','Doddajala','Yelahanka','Jakkur Cross','Hebbal','Veerannapalya','Nagawara','KR Pura','Mahadevapura','Marathahalli','Bellandur','Central Silk Board']
+ };
+ const interchange=['Majestic','Jayadeva Hospital','KR Pura','Nagawara','Central Silk Board','Lalbagh','MG Road'];
+ function lineFor(station){return Object.entries(groups).filter(([line,stations])=>stations.includes(station)).map(([line])=>line)}
+ function estimate(a,b){
+   if(a===b)return {stops:0,mins:0,fare:0,lines:[]};
+   let la=lineFor(a),lb=lineFor(b),shared=la.filter(x=>lb.includes(x));
+   let lines=shared.length?shared:[...new Set([...la,...lb])];
+   // For this concept demo, count approximate positions on a common line; cross-line
+   // journeys add a transfer and a small interchange allowance.
+   let best=999;
+   for(const line of lines){let s=groups[line],ia=s.indexOf(a),ib=s.indexOf(b);if(ia>=0&&ib>=0)best=Math.min(best,Math.abs(ia-ib))}
+   if(best===999)best=Math.max(2,Math.round((a.length+b.length)/4)+4);
+   let transfers=shared.length?0:1;
+   let stops=best+(transfers?2:0),mins=Math.max(8,stops*3.2+transfers*7+4);
+   let fare=Math.max(10,Math.min(60,Math.ceil((10+stops*2.2)/5)*5));
+   return {stops,mins:Math.round(mins),fare,lines,transfers};
+ }
+ document.getElementById('metro-calculate').addEventListener('click',()=>{
+  let a=fromEl.value,b=toEl.value,r=estimate(a,b);
+  out.style.display='block';
+  if(a===b){out.textContent='Choose two different stations to estimate your trip.';return}
+  out.innerHTML='<strong>Indicative trip estimate</strong><br>🚉 Around '+r.stops+' stops · ⏱ '+r.mins+' min · ₹'+r.fare+' estimated fare<br>Line(s): '+r.lines.join(' + ')+' line'+(r.lines.length>1?'s':'')+(r.transfers?' · Allow for an interchange':'')+'<br><small>Demo estimate only. Confirm current service, fare and interchange with official Namma Metro information before travelling.</small>';
+ });
+ document.querySelectorAll('.metro-quick button').forEach(btn=>btn.addEventListener('click',()=>{fromEl.value=btn.dataset.from;toEl.value=btn.dataset.to;document.getElementById('metro-calculate').click()}));
+ document.getElementById('metro-fill-route').addEventListener('click',()=>{document.getElementById('from').value=fromEl.value+', Bengaluru';document.getElementById('to').value=toEl.value+', Bengaluru';document.getElementById('search').click();window.scrollTo({top:0,behavior:'smooth'})});
+ document.getElementById('metro-map-image').addEventListener('click',()=>modal.classList.add('open'));
+ document.getElementById('metro-map-close').addEventListener('click',()=>modal.classList.remove('open'));
+ modal.addEventListener('click',e=>{if(e.target===modal)modal.classList.remove('open')});
+ document.addEventListener('keydown',e=>{if(e.key==='Escape')modal.classList.remove('open')});
+})();
+
+</script>
+<script>
+const $=id=>document.getElementById(id);
+let map=null, routeLayer=null, markers=[], lastOptions=[];
+const modes=[
+ {id:'bus',name:'City bus',icon:'🚌',base:8,km:2.1,min:5,eco:92,wait:9,tag:'Lowest cost',tagClass:'',desc:'Public transport'},
+ {id:'metro',name:'Metro',icon:'🚇',base:10,km:2.4,min:2.1,eco:96,wait:6,tag:'Low emissions',tagClass:'blue',desc:'Rail transit'},
+ {id:'bike',name:'Bike taxi',icon:'🏍️',base:20,km:7.5,min:2.8,eco:54,wait:4,tag:'Quick pickup',tagClass:'purple',desc:'Two-wheeler ride'},
+ {id:'auto',name:'Auto rickshaw',icon:'🛺',base:30,km:13,min:3.1,eco:42,wait:5,tag:'Door to door',tagClass:'',desc:'Three-wheeler ride'},
+ {id:'cab',name:'Cab',icon:'🚕',base:55,km:16,min:2.7,eco:30,wait:6,tag:'Comfort pick',tagClass:'purple',desc:'App-based cab'},
+ {id:'car',name:'Drive your car',icon:'🚗',base:25,km:8.5,min:2.5,eco:25,wait:0,tag:'Your own vehicle',tagClass:'',desc:'Estimated fuel cost'}
+];
+function toast(msg){$('toast').textContent=msg;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),2600)}
+$('swap').onclick=()=>{let a=$('from').value;$ ('from').value=$('to').value;$('to').value=a};
+$('locate').onclick=()=>{if(!navigator.geolocation){toast('Location is not supported by this browser.');return} $('locate').textContent='Finding your location…';navigator.geolocation.getCurrentPosition(async p=>{try{let r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${p.coords.latitude}&lon=${p.coords.longitude}`);let d=await r.json();$('from').value=d.display_name||`${p.coords.latitude.toFixed(4)}, ${p.coords.longitude.toFixed(4)}`}catch(e){$('from').value=`${p.coords.latitude.toFixed(4)}, ${p.coords.longitude.toFixed(4)}`} $('locate').textContent='◎ Use my current location'},()=>{$('locate').textContent='◎ Use my current location';toast('Could not access location. Please type your starting point.')},{enableHighAccuracy:true,timeout:9000})};
+async function geocode(q){let r=await fetch('https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q='+encodeURIComponent(q));if(!r.ok)throw Error('Location lookup failed');let d=await r.json();if(!d.length)throw Error('Could not find “'+q+'”. Try adding your city.');return {lat:+d[0].lat,lon:+d[0].lon,name:d[0].display_name}}
+async function roadDistance(a,b){try{let r=await fetch(`https://router.project-osrm.org/route/v1/driving/${a.lon},${a.lat};${b.lon},${b.lat}?overview=full&geometries=geojson`);let d=await r.json();if(d.routes&&d.routes[0])return {km:d.routes[0].distance/1000,minutes:d.routes[0].duration/60,coords:d.routes[0].geometry.coordinates.map(c=>[c[1],c[0]])}}catch(e){}return null}
+function calcOptions(km,roadMin){let peak=$('when').value==='peak'?1.22:($('when').value==='offpeak'?.94:1);return modes.map(m=>{let dist=m.id==='metro'?km*.78:km;let fare=(m.base+dist*m.km)*peak;if(m.id==='car')fare=25+dist*.105*105; if(m.id==='metro')fare=Math.max(10,Math.min(60,Math.ceil(fare/5)*5));if(m.id==='bus')fare=Math.max(5,Math.ceil(fare/5)*5);if(m.id==='bike'||m.id==='auto'||m.id==='cab')fare=Math.ceil(fare/5)*5;let mins=m.id==='metro'?Math.max(8,km*2.1+8):m.id==='bus'?km*3.3+12:m.id==='bike'?km*2.8+4:m.id==='auto'?km*3.1+5:m.id==='cab'?km*2.7+7:roadMin||km*2.5;mins+=m.wait;return {...m,fare:Math.round(fare),mins:Math.round(mins),dist}})}
+function drawMap(a,b,coords){$('map-placeholder').style.display='none';$('map').style.display='block';if(!map){map=L.map('map',{zoomControl:false,scrollWheelZoom:false}).setView([a.lat,a.lon],12);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap'}).addTo(map)}markers.forEach(x=>map.removeLayer(x));markers=[];if(routeLayer)map.removeLayer(routeLayer);markers.push(L.marker([a.lat,a.lon]).addTo(map).bindPopup('Start'));markers.push(L.marker([b.lat,b.lon]).addTo(map).bindPopup('Destination'));routeLayer=L.polyline(coords||[[a.lat,a.lon],[b.lat,b.lon]],{color:'#729447',weight:5,dashArray:coords?null:'7 8'}).addTo(map);map.fitBounds(routeLayer.getBounds(),{padding:[18,18]});setTimeout(()=>map.invalidateSize(),100);$('map-caption').textContent='Approximate driving route • Map data © OpenStreetMap'}
+function render(){let sorted=[...lastOptions],sort=$('sort').value;if(sort==='price')sorted.sort((a,b)=>a.fare-b.fare);if(sort==='time')sorted.sort((a,b)=>a.mins-b.mins);if(sort==='eco')sorted.sort((a,b)=>b.eco-a.eco);let min=Math.min(...lastOptions.map(x=>x.fare)),max=Math.max(...lastOptions.map(x=>x.fare));$('saving').textContent='₹'+(max-min);$('insight').textContent=`${sorted[0].name} is the lowest estimated fare. Choosing it over the highest-priced option could save around ₹${max-min}. Actual prices vary by operator, traffic and demand.`;$('results').innerHTML=sorted.map((o,i)=>`<article class="fare-card"><div class="fare-main"><div class="mode-icon">${o.icon}</div><div><div class="mode-name">${o.name} ${i===0&&sort==='price'?'<span class="tag">CHEAPEST</span>':''}</div><div class="mode-meta">${o.desc} • approx. ${o.dist.toFixed(1)} km</div></div></div><div class="fare-price">₹${o.fare}<small>estimated total</small></div><div class="card-bottom"><span>◷ ${o.mins} min</span><span>♧ Eco score ${o.eco}/100</span><span class="tag ${o.tagClass}">${o.tag}</span><button class="choose" data-mode="${o.id}">Split fare</button></div></article>`).join('');document.querySelectorAll('.choose').forEach(btn=>btn.onclick=()=>{let o=lastOptions.find(x=>x.id===btn.dataset.mode);let n=prompt('How many people are travelling?', '2');if(n===null)return;n=Math.max(1,parseInt(n)||1);toast(`${o.name}: approx. ₹${Math.ceil(o.fare/n)} per person for ${n} people.`)});}
+$('sort').onchange=()=>{if(lastOptions.length)render()};
+$('search').onclick=async()=>{let from=$('from').value.trim(),to=$('to').value.trim();if(!from||!to){toast('Please enter both starting point and destination.');return}if(from.toLowerCase()===to.toLowerCase()){toast('Start and destination should be different.');return}let btn=$('search');btn.disabled=true;btn.innerHTML='<span class="loading"></span>Finding routes…';$('result-sub').textContent='Looking up locations and estimating your journey…';try{let [a,b]=await Promise.all([geocode(from),geocode(to)]);let route=await roadDistance(a,b);let km=route?route.km:(()=>{let R=6371,dLat=(b.lat-a.lat)*Math.PI/180,dLon=(b.lon-a.lon)*Math.PI/180,x=Math.sin(dLat/2)**2+Math.cos(a.lat*Math.PI/180)*Math.cos(b.lat*Math.PI/180)*Math.sin(dLon/2)**2;return 2*R*Math.asin(Math.sqrt(x))*1.3})();if(km<.2)throw Error('These locations appear very close. Try more specific addresses.');lastOptions=calcOptions(km,route?.minutes);render();drawMap(a,b,route?.coords);$('result-sub').textContent=`${from} → ${to}  •  approx. ${km.toFixed(1)} km  •  indicative fares in ₹`;document.querySelector('.results-head').scrollIntoView({behavior:'smooth',block:'start'})}catch(e){$('results').innerHTML=`<div class="empty"><b>We couldn't calculate this route.</b>${e.message}<br>Try adding a neighbourhood and city, such as “Indiranagar, Bengaluru”.</div>`;$('result-sub').textContent='Please check the locations and try again.';toast(e.message)}finally{btn.disabled=false;btn.textContent='Find my best fare  →'}};
+$('from').addEventListener('keydown',e=>{if(e.key==='Enter')$('to').focus()});$('to').addEventListener('keydown',e=>{if(e.key==='Enter')$('search').click()});
+
+// Metro Explorer: simple station-pair estimate based on the supplied 2025 map.
+// It is intentionally labelled indicative; this is not a live Namma Metro timetable/API.
+(function(){
+ const fromEl=document.getElementById('metro-from'),toEl=document.getElementById('metro-to'),out=document.getElementById('metro-result');
+ const modal=document.getElementById('metro-map-modal');
+ const groups={
+  'Purple':['Challaghatta','Kengeri','Pattanagere','Jnanabharathi','Nayandahalli','Mysuru Road','Deepanjali Nagar','Attiguppe','Vijayanagar','Majestic','Cubbon Park','MG Road','Trinity','Indiranagar','Hoodi','KR Pura','Whitefield (Kadugodi)'],
+  'Green':['Silk Institute','Konanakunte Cross','Yelachenahalli','Jaya Prakash Nagar','Banashankari','Rashtriya Vidyalaya Road','Lalbagh','South End Circle','National College','Majestic','Manjunathanagar','Nagasandra','Madavara'],
+  'Yellow':['Ragigudda','Jayadeva Hospital','BTM Layout','Central Silk Board','Bommanahalli','Hongasandra','Kudlu Gate','Singasandra','Hosa Road','Beratena Agrahara','Electronic City','Bommasandra'],
+  'Pink':['Kalena Agrahara','JP Nagar 4th Phase','Jayadeva Hospital','Tavarekere','Dairy Circle','Lakkasandra','Lalbagh','MG Road','Majestic','Pottery Town','Tannery Road','Venkateshpura','Nagawara'],
+  'Blue':['Kempegowda International Airport','Airport City','Doddajala','Yelahanka','Jakkur Cross','Hebbal','Veerannapalya','Nagawara','KR Pura','Mahadevapura','Marathahalli','Bellandur','Central Silk Board']
+ };
+ const interchange=['Majestic','Jayadeva Hospital','KR Pura','Nagawara','Central Silk Board','Lalbagh','MG Road'];
+ function lineFor(station){return Object.entries(groups).filter(([line,stations])=>stations.includes(station)).map(([line])=>line)}
+ function estimate(a,b){
+   if(a===b)return {stops:0,mins:0,fare:0,lines:[]};
+   let la=lineFor(a),lb=lineFor(b),shared=la.filter(x=>lb.includes(x));
+   let lines=shared.length?shared:[...new Set([...la,...lb])];
+   // For this concept demo, count approximate positions on a common line; cross-line
+   // journeys add a transfer and a small interchange allowance.
+   let best=999;
+   for(const line of lines){let s=groups[line],ia=s.indexOf(a),ib=s.indexOf(b);if(ia>=0&&ib>=0)best=Math.min(best,Math.abs(ia-ib))}
+   if(best===999)best=Math.max(2,Math.round((a.length+b.length)/4)+4);
+   let transfers=shared.length?0:1;
+   let stops=best+(transfers?2:0),mins=Math.max(8,stops*3.2+transfers*7+4);
+   let fare=Math.max(10,Math.min(60,Math.ceil((10+stops*2.2)/5)*5));
+   return {stops,mins:Math.round(mins),fare,lines,transfers};
+ }
+ document.getElementById('metro-calculate').addEventListener('click',()=>{
+  let a=fromEl.value,b=toEl.value,r=estimate(a,b);
+  out.style.display='block';
+  if(a===b){out.textContent='Choose two different stations to estimate your trip.';return}
+  out.innerHTML='<strong>Indicative trip estimate</strong><br>🚉 Around '+r.stops+' stops · ⏱ '+r.mins+' min · ₹'+r.fare+' estimated fare<br>Line(s): '+r.lines.join(' + ')+' line'+(r.lines.length>1?'s':'')+(r.transfers?' · Allow for an interchange':'')+'<br><small>Demo estimate only. Confirm current service, fare and interchange with official Namma Metro information before travelling.</small>';
+ });
+ document.querySelectorAll('.metro-quick button').forEach(btn=>btn.addEventListener('click',()=>{fromEl.value=btn.dataset.from;toEl.value=btn.dataset.to;document.getElementById('metro-calculate').click()}));
+ document.getElementById('metro-fill-route').addEventListener('click',()=>{document.getElementById('from').value=fromEl.value+', Bengaluru';document.getElementById('to').value=toEl.value+', Bengaluru';document.getElementById('search').click();window.scrollTo({top:0,behavior:'smooth'})});
+ document.getElementById('metro-map-image').addEventListener('click',()=>modal.classList.add('open'));
+ document.getElementById('metro-map-close').addEventListener('click',()=>modal.classList.remove('open'));
+ modal.addEventListener('click',e=>{if(e.target===modal)modal.classList.remove('open')});
+ document.addEventListener('keydown',e=>{if(e.key==='Escape')modal.classList.remove('open')});
+})();
+
+</script>
+</body>
+</html>
